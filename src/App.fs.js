@@ -3,6 +3,7 @@ import { record_type, lambda_type, unit_type, string_type } from "../fable_modul
 import { ofArray, tryFind } from "../fable_modules/fable-library-js.4.18.0/List.js";
 import { map } from "../fable_modules/fable-library-js.4.18.0/Option.js";
 import { load } from "./About.fs.js";
+import { load as load_1 } from "./MDNCanvasTutorial/Index.fs.js";
 import { printf, toConsole } from "../fable_modules/fable-library-js.4.18.0/String.js";
 
 export class Router_Route extends Record {
@@ -27,6 +28,7 @@ function Router_replaceState(route) {
         path: route.path,
     }, route.title, route.path);
     route.callback();
+    document.title = route.title;
 }
 
 function Router_pushState(route) {
@@ -34,10 +36,12 @@ function Router_pushState(route) {
         path: route.path,
     }, route.title, route.path);
     route.callback();
+    document.title = route.title;
 }
 
 function Router_keepState(route) {
     route.callback();
+    document.title = route.title;
 }
 
 function Router_loadRoute(path, historyFun, router_1) {
@@ -66,14 +70,15 @@ export function changeTitle(title) {
     document.title = title;
 }
 
-export const router = ofArray([new Router_Route("/", "Home", () => {
+export const defaultTitle = "Fable Experiments";
+
+export const router = ofArray([new Router_Route("/", defaultTitle + " - Home", () => {
     document.getElementById("app").innerHTML = "Home";
     document.title = "Fable - Home";
-}), new Router_Route("/about", "About", () => {
+}), new Router_Route("/about", defaultTitle + " - About", () => {
     load();
-}), new Router_Route("/contact", "Contact", () => {
-    toConsole(printf("/contact"));
-    changeTitle("Fable - Contact");
+}), new Router_Route("/mdn-canvas-tutorial", defaultTitle + " - Port - MDN Canvas Tutorial", () => {
+    load_1();
 })]);
 
 export function setupNavigation() {
@@ -93,6 +98,15 @@ window.addEventListener("popstate", (_arg) => {
 });
 
 window.onload = ((_arg) => {
+    const appBaseUrl = document.getElementById("app-base");
+    const arg = window.location.hostname;
+    toConsole(printf("%s"))(arg);
+    if (window.location.hostname === "localhost") {
+        appBaseUrl.setAttribute("href", "http://localhost:5173");
+    }
+    else {
+        appBaseUrl.setAttribute("href", "https://davidbruce.fable-experiments.github.io");
+    }
     toConsole(printf("onload"));
     setupNavigation();
     Router_initialRoute(window.location.pathname, router);
