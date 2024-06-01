@@ -1,10 +1,10 @@
 import { Record } from "../fable_modules/fable-library-js.4.18.0/Types.js";
-import { record_type, lambda_type, unit_type, string_type } from "../fable_modules/fable-library-js.4.18.0/Reflection.js";
-import { ofArray, tryFind } from "../fable_modules/fable-library-js.4.18.0/List.js";
+import { list_type, record_type, lambda_type, unit_type, string_type } from "../fable_modules/fable-library-js.4.18.0/Reflection.js";
+import { replace, printf, toConsole } from "../fable_modules/fable-library-js.4.18.0/String.js";
 import { map } from "../fable_modules/fable-library-js.4.18.0/Option.js";
+import { ofArray, tryFind } from "../fable_modules/fable-library-js.4.18.0/List.js";
 import { load } from "./About.fs.js";
 import { load as load_1 } from "./MDNCanvasTutorial/Index.fs.js";
-import { printf, toConsole } from "../fable_modules/fable-library-js.4.18.0/String.js";
 
 export class Router_Route extends Record {
     constructor(path, title, callback) {
@@ -19,8 +19,21 @@ export function Router_Route_$reflection() {
     return record_type("App.Router.Route", [], Router_Route, () => [["path", string_type], ["title", string_type], ["callback", lambda_type(unit_type, unit_type)]]);
 }
 
+export class Router_Router extends Record {
+    constructor(root, routes) {
+        super();
+        this.root = root;
+        this.routes = routes;
+    }
+}
+
+export function Router_Router_$reflection() {
+    return record_type("App.Router.Router", [], Router_Router, () => [["root", string_type], ["routes", list_type(Router_Route_$reflection())]]);
+}
+
 function Router_findRoute(path, router_1) {
-    return tryFind((r) => (r.path === path), router_1);
+    toConsole(printf("findRoute: %s"))(path);
+    return map((r_1) => (new Router_Route(router_1.root + r_1.path, r_1.title, r_1.callback)), tryFind((r) => (r.path === path), router_1.routes));
 }
 
 function Router_replaceState(route) {
@@ -72,14 +85,14 @@ export function changeTitle(title) {
 
 export const defaultTitle = "Fable Experiments";
 
-export const router = ofArray([new Router_Route("/", defaultTitle + " - Home", () => {
+export const router = new Router_Router("/fable-experiments", ofArray([new Router_Route("/", defaultTitle + " - Home", () => {
     document.getElementById("app").innerHTML = "Home";
     document.title = "Fable - Home";
 }), new Router_Route("/about", defaultTitle + " - About", () => {
     load();
 }), new Router_Route("/mdn-canvas-tutorial", defaultTitle + " - Port - MDN Canvas Tutorial", () => {
     load_1();
-})]);
+})]));
 
 export function setupNavigation() {
     const links = document.getElementsByClassName("app-route");
@@ -94,21 +107,14 @@ export function setupNavigation() {
 }
 
 window.addEventListener("popstate", (_arg) => {
-    Router_backTo(window.location.pathname, router);
+    Router_backTo(replace(window.location.pathname, router.root, ""), router);
 });
 
 window.onload = ((_arg) => {
-    const appBaseUrl = document.getElementById("app-base");
-    const arg = window.location.hostname;
-    toConsole(printf("%s"))(arg);
-    if (window.location.hostname === "localhost") {
-        appBaseUrl.setAttribute("href", "http://localhost:5173");
-    }
-    else {
-        appBaseUrl.setAttribute("href", "https://davidbruce.fable-experiments.github.io");
-    }
     toConsole(printf("onload"));
+    const arg = window.location.pathname;
+    toConsole(printf("window.location.pathname: %s"))(arg);
     setupNavigation();
-    Router_initialRoute(window.location.pathname, router);
+    Router_initialRoute(replace(window.location.pathname, router.root, ""), router);
 });
 

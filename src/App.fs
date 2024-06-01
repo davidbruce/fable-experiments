@@ -5,10 +5,13 @@ open Browser.Types
 
 module Router =
     type Route = { path: string; title: string; callback: unit -> unit }
-    type Router = Route list
+    type Router = { root: string; routes: Route list }
 
     let private findRoute (path: string) (router: Router) =
-        router |> List.tryFind (fun r -> r.path = path)
+        printfn "findRoute: %s" path
+        router.routes 
+        |> List.tryFind (fun r -> r.path = path)
+        |> Option.map (fun r ->  { path = router.root + r.path; title = r.title; callback = r.callback })
 
     let private replaceState (route: Route) =
         history.replaceState({| path = route.path |}, route.title, route.path)
@@ -27,7 +30,6 @@ module Router =
     let private loadRoute (path: string) (historyFun: Route -> unit) (router: Router) =
         findRoute path router 
         |> Option.map historyFun 
-            
 
     let initialRoute (path: string) (router: Router) =
         router |> loadRoute path replaceState
@@ -45,11 +47,14 @@ let changeTitle (title: string) =
 
 let defaultTitle = "Fable Experiments"
 
-let router: Router = [
-    { path = "/"; title = defaultTitle + " - Home"; callback = fun _ -> document.getElementById("app").innerHTML <- "Home"; document.title <- "Fable - Home" }
-    { path = "/about"; title = defaultTitle + " - About"; callback = About.load }
-    { path = "/mdn-canvas-tutorial"; title = defaultTitle + " - Port - MDN Canvas Tutorial"; callback = MDNCanvasTutorial.Index.load }
-]
+let router: Router = { 
+    root = "/fable-experiments"; 
+    routes = [
+        { path = "/"; title = defaultTitle + " - Home"; callback = fun _ -> document.getElementById("app").innerHTML <- "Home"; document.title <- "Fable - Home" }
+        { path = "/about"; title = defaultTitle + " - About"; callback = About.load }
+        { path = "/mdn-canvas-tutorial"; title = defaultTitle + " - Port - MDN Canvas Tutorial"; callback = MDNCanvasTutorial.Index.load }
+    ]
+}
 
 let setupNavigation () =
     let links = document.getElementsByClassName("app-route") 
@@ -61,20 +66,16 @@ let setupNavigation () =
             router |> navigateTo path |> ignore
         )
 
-window.addEventListener("popstate", fun _ -> router |> backTo window.location.pathname |> ignore;)
+window.addEventListener("popstate", fun _ -> router |> backTo (window.location.pathname.Replace(router.root, "")) |> ignore;)
 
 window.onload <- 
     fun _ ->
-        //change this to be somekind of compiletime change
-        let appBaseUrl = document.getElementById("app-base")
-        printfn "%s" window.location.hostname
-        if window.location.hostname = "localhost" 
-            then appBaseUrl.setAttribute("href", "http://localhost:5173")
-            else appBaseUrl.setAttribute("href", "https://davidbruce.fable-experiments.github.io")
-        
         printfn "onload"
+        printfn "window.location.pathname: %s" window.location.pathname
+
         setupNavigation ()
+
         router 
-        |> initialRoute window.location.pathname 
+        |> initialRoute (window.location.pathname.Replace(router.root, ""))
         |> ignore
 
