@@ -70,7 +70,6 @@ window.addEventListener("popstate", fun _ -> router |> backTo (window.location.p
 
 window.onload <- 
     fun _ ->
-        printfn "onload"
         printfn "window.location.pathname: %s" window.location.pathname
 
         setupNavigation ()
