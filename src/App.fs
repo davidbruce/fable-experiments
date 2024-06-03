@@ -2,6 +2,10 @@
 
 open Browser
 open Browser.Types
+open Fable.Core
+open Fable.Core.JsInterop
+
+import "h" "dom-chef"
 
 module Router =
     type Route = { path: string; title: string; callback: unit -> unit }
@@ -47,10 +51,24 @@ let changeTitle (title: string) =
 
 let defaultTitle = "Fable Experiments"
 
+
+let html = 
+    JSX.html 
+        $"""
+            <div>David Bruce's site for experimenting with F# and Fable</div>
+        """
+
 let router: Router = { 
     root = "/fable-experiments"; 
     routes = [
-        { path = "/"; title = defaultTitle + " - Home"; callback = fun _ -> document.getElementById("app").innerHTML <- "Home"; document.title <- "Fable - Home" }
+        { path = "/"; title = defaultTitle + " - Home"; callback = (fun _ -> 
+                printfn "clearing"
+                let root = document.getElementById("app")
+                root.innerHTML <- "" 
+                root.appendChild(html :> obj :?> HTMLElement) |> ignore
+                document.title <- "Fable - Home"
+            ) 
+        }
         { path = "/about"; title = defaultTitle + " - About"; callback = About.load }
         { path = "/mdn-canvas-tutorial"; title = defaultTitle + " - Port - MDN Canvas Tutorial"; callback = MDNCanvasTutorial.Index.load }
     ]

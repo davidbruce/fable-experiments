@@ -54,5 +54,5 @@ let x =
 let load () = 
     let root = document.getElementById("app")
     printfn("at mdn-canvas-tutorial")
-    root.innerHTML = "" |> ignore
+    root.innerHTML <- "" 
     root.appendChild(x :> obj :?> HTMLElement) |> ignore
