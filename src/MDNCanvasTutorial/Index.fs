@@ -15,12 +15,12 @@ let things = ["Hello, world!"; "Using Dom-chef + F#"]
 let Thing () =
     JSX.html 
         $"""
-        <div>
+        <>
             {things 
                 |> List.map (fun x -> JSX.html $"<span>{x}</span>") 
                 |> List.toArray 
             }
-        </div>
+        </>
         """
 
 let Thing2 () = 
@@ -54,4 +54,5 @@ let x =
 let load () = 
     let root = document.getElementById("app")
     printfn("at mdn-canvas-tutorial")
+    root.innerHTML = "" |> ignore
     root.appendChild(x :> obj :?> HTMLElement) |> ignore
