@@ -111,7 +111,6 @@ window.addEventListener("popstate", (_arg) => {
 });
 
 window.onload = ((_arg) => {
-    toConsole(printf("onload"));
     const arg = window.location.pathname;
     toConsole(printf("window.location.pathname: %s"))(arg);
     setupNavigation();

@@ -19,5 +19,8 @@
   "homepage": "https://github.com/davidbruce/fable-experiments#readme",
   "devDependencies": {
     "vite": "^5.2.12"
+  },
+  "dependencies": {
+    "dom-chef": "^5.1.1"
   }
 }
