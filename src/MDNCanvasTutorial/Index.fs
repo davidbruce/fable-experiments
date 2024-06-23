@@ -4,55 +4,60 @@ open Browser
 open Browser.Types
 open Fable.Core
 open Fable.Core.JsInterop
-
-//JSX renderer
-import "h" "dom-chef"
+open Highligher
 
 let name = "Phillip"
 let age = 30
 let things = ["Hello, world!"; "Using Dom-chef + F#"]
 
-let Thing () =
-    JSX.html 
+
+let thing () = 
+    html 
         $"""
-        <>
+        <div>
             {things 
-                |> List.map (fun x -> JSX.html $"<span>{x}</span>") 
+                |> List.map (fun x -> html $"<span>{x}</span>") 
                 |> List.toArray 
             }
-        </>
+        </div>
         """
-
-let Thing2 () = 
-    JSX.html $"""<h1 class="Heading">Hello Thing 2</h1>"""
-
-let Thing3 () =
-    let title = document.createElement("h1")
-    title.classList.add("Heading")
-    title.innerHTML <- "Hello Thing 3"
-    title
 
 let handleClick e = 
     printfn "clicked"
 
-let x =
-    JSX.html
-        $""" 
-        <div>
-            <span onClick={handleClick}>Click Me!</span>
-            <br/>
-            Name: {name}, Age: {age}
-            <Thing/>
-            <Thing2/>
-            <Thing3/>
-            <br/>
-            <h1>Hello, world!</h1>
-            <p>Using Dom-chef + F#</p>
-        </div>
-        """
+let renderCanvas () =
+    let canvas = document.getElementById("tutorial") :?> HTMLCanvasElement
+    let ctx = canvas.getContext_2d()
 
+    ctx.fillStyle <- U3.Case1 ("rgb(200 0 0)")
+    ctx.fillRect(10, 10, 50, 50)
+
+    ctx.fillStyle <- U3.Case1 ("rgb(0 0 200 / 50%)")
+    ctx.fillRect(30, 30, 50, 50)
+
+let template () =
+    html
+        $""" 
+        <article>
+            <button type="button">Click Me!</button>
+            {thing ()}
+            <canvas id="tutorial" width="150" height="150">
+                Cavnas tutorial element
+            </canvas>
+        </article>
+        """
+    , 
+    (fun () -> 
+        let button = document.querySelector("button")
+        button.addEventListener("click", handleClick)
+        renderCanvas()
+    )
+
+// open BasicUsage
 let load () = 
     let root = document.getElementById("app")
     printfn("at mdn-canvas-tutorial")
     root.innerHTML <- "" 
-    root.appendChild(x :> obj :?> HTMLElement) |> ignore
+    let (markup, script) = template ()
+    root.innerHTML <- markup 
+    script ()

@@ -10,13 +10,5 @@ export default defineConfig({
                 "**/*.fs" // Don't watch F# files
             ]
         }
-    },
-    esbuild: {
-        include: /\.js$/,
-        exclude: [],
-        loader: 'jsx',
-        jsx: "transform",
-        jsxFactory: "h",
-		jsxFragment: "DocumentFragment",
     }
 })
