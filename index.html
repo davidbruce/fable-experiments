@@ -41,21 +41,31 @@
           html {
             font-size: 14px;
           }
-          
           nav > .app-route {
             border-top: 0px;
             border-right: 0px;
             border-left: 0px;
-            border-bottom:  1px solid var(--border);;
+            border-bottom:  1px solid var(--border);
           }
+
           nav > .active {
             border: 1px solid var(--border);
           }
+
+          @media only screen and (width <= 720px) {
+            header > nav a {
+              padding: .1rem 1rem;
+              line-height: 2;
+              text-decoration: none;
+            }
+          }
+
           main {
             animation: fadeInAnimation ease 2s;
             animation-iteration-count: 1;
             animation-fill-mode: forwards;
           }
+
 
           @keyframes fadeInAnimation {
               0% {

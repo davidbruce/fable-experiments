@@ -10,7 +10,12 @@
     <Compile Include="src/Highlighter.fs" />
     <Compile Include="src/WebComponents/Sample.fs" /> 
     <Compile Include="src/CssModules.fs" />
+
+
+    <Compile Include="src/MDNCanvasTutorial/DrawingShapes.fs" />
     <Compile Include="src/MDNCanvasTutorial/Index.fs" />
+
+
     <Compile Include="src/Home.fs" />
     <Compile Include="src/About.fs" />
     <Compile Include="src/App.fs" />
